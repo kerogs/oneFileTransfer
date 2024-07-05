@@ -1,4 +1,4 @@
-package base
+package cli
 
 import (
 	"fmt"
@@ -44,4 +44,29 @@ func AsciiStart(){
     fmt.Println("    '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$!!!!!!!!!!!!!!!!!!,")
     fmt.Println(".....$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$.....")
 	fmt.Println(color.Reset)
+}
+
+func Status(cliPrefix, cliType, cliSuffix, cliEnd string) {
+    // Prefix
+    fmt.Print("Mode      ")
+    if cliPrefix == "user" {
+        fmt.Println(color.Green + cliPrefix + color.Reset)
+    } else if cliPrefix == "host" {
+        fmt.Println(color.Red + cliPrefix + color.Reset)
+    } else if cliPrefix == "lurker"{
+        fmt.Println(color.Magenta + cliPrefix + color.Reset)
+    }
+
+    // Type
+    fmt.Print("Type      ")
+    if cliType == "@" {
+        fmt.Println(color.Green + cliType + color.Reset)
+    }
+
+    // Suffix
+    fmt.Print("Suffix    ")
+    if cliSuffix != "" {
+        fmt.Println(color.Orange + cliSuffix + color.Reset)
+    }
+
 }

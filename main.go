@@ -16,6 +16,7 @@ import (
 var (
 	// Variables globales pour l'application
 	hostMode = false
+	folderPath = ""
 
 	// Variables pour l'interface CLI
 	cliPrefix = "user"
@@ -28,12 +29,17 @@ var (
 func main() {
 	cliSuffix = GetOutboundIP().String()
 	reader := bufio.NewReader(os.Stdin)
-	base.AsciiStart()
+	cli.AsciiStart()
 
 	for {
 		if cliPrefix == "user" {
 			cliSTR = color.Green + cliPrefix + cliType + color.Orange + cliSuffix + color.Green + cliEnd + " " + color.Reset
+		} else if(cliPrefix == "host") {
+			cliSTR = color.Red + cliPrefix + color.Green + cliType + color.Orange + cliSuffix + color.Green + cliEnd + " " + color.Reset
+		} else{
+			cliSTR = color.Red+"[ERROR cliSTR]"+color.Reset
 		}
+
 		fmt.Print(cliSTR)
 
 		command, err := reader.ReadString('\n')
@@ -65,13 +71,19 @@ func Command(commands []string) {
 		subCommand := commands[1]
 		switch subCommand {
 		case "help":
-			base.Help()
+			cli.Help()
 		case "kill":
 			fmt.Println("Arrêt du programme...")
 			// Ajoutez ici le code pour arrêter proprement votre programme si nécessaire
 			os.Exit(0)
 		case "clear":
-			base.ClearScreen()
+			cli.ClearScreen()
+		case "status":
+			cli.Status(cliPrefix, cliType, cliSuffix, cliEnd)
+		case "host":
+			cli.Host(&hostMode, commands, &cliPrefix, &folderPath)
+		case "login":
+			cli.Login(commands[2])
 		default:
 			fmt.Printf("Commande 'oft %s' non reconnue.\n", subCommand)
 		}
