@@ -83,7 +83,7 @@ func Command(commands []string) {
 		case "host":
 			cli.Host(&hostMode, commands, &cliPrefix, &folderPath)
 		case "login":
-			cli.Login(commands[2])
+			// cli.Login(commands[2])
 		default:
 			fmt.Printf("Commande 'oft %s' non reconnue.\n", subCommand)
 		}

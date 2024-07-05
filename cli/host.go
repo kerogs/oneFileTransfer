@@ -5,6 +5,7 @@ import (
     "log"
     "net/http"
     "path/filepath"
+    "io/ioutil"
 )
 
 var (
@@ -41,6 +42,10 @@ func Host(hostMode *bool, commands []string, cliPrefix *string, folderPath *stri
         *folderPath = ""
 
         stopServer()
+
+    } else if commands[2] == "scan" && len(commands) >= 4 {
+        ipPort := commands[3]
+        scanFolder(ipPort)
 
     } else {
         fmt.Println("Args detection error")
@@ -94,4 +99,22 @@ func resetServeMux() {
         http.Error(w, "Not found", http.StatusNotFound)
     }))
     fmt.Println("ServeMux reset.")
+}
+
+func scanFolder(ipPort string) {
+    // Send HTTP request to server at ipPort to get directory listing
+    resp, err := http.Get("http://" + ipPort + "/files/")
+    if err != nil {
+        log.Fatal("Error scanning folder:", err)
+    }
+    defer resp.Body.Close()
+
+    // Read response body
+    body, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        log.Fatal("Error reading response body:", err)
+    }
+
+    // Print directory listing
+    fmt.Println("Directory listing from " + ipPort + ":\n" + string(body))
 }
