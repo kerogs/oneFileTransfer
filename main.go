@@ -1,47 +1,79 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
-	"net"
 	"log"
+	"net"
+	"oft/config/colors"
+	"oft/config/cli"
+	"os"
+	// "os/exec"
+	"strings"
+	"unicode"
 )
 
 var (
 	// Variables globales pour l'application
-	command string
 	hostMode = false
-	
+
 	// Variables pour l'interface CLI
 	cliPrefix = "user"
-	cliType = "@"
+	cliType   = "@"
 	cliSuffix = ""
-	cliEnd = "~>"
-	cliSTR string
+	cliEnd    = "~>"
+	cliSTR    string
 )
 
 func main() {
 	cliSuffix = GetOutboundIP().String()
-	
+	reader := bufio.NewReader(os.Stdin)
+	base.AsciiStart()
+
 	for {
-		cliSTR = cliPrefix + cliType + cliSuffix + cliEnd
+		if cliPrefix == "user" {
+			cliSTR = color.Green + cliPrefix + cliType + color.Orange + cliSuffix + color.Green + cliEnd + " " + color.Reset
+		}
 		fmt.Print(cliSTR)
-		fmt.Scanln(&command)
-		command := os.Args
-		Command()
+
+		command, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println("Erreur lors de la lecture de l'entrée:", err)
+			continue
+		}
+		
+		command = strings.TrimSpace(command)
+		commands := splitCommand(command)
+		Command(commands)
+		fmt.Println("")
 	}
 }
 
-func Command() {
-	if command == "oft" {
+func Command(commands []string) {
+	if len(commands) == 0 {
+		fmt.Println("Aucune commande fournie.")
+		return
+	}
+
+	if commands[0] == "oft" {
 		// Si la commande est "oft", on vérifie la sous-commande
-		switch command {
+		if len(commands) < 2 {
+			fmt.Println("Veuillez spécifier une sous-commande pour 'oft'.")
+			return
+		}
+
+		subCommand := commands[1]
+		switch subCommand {
 		case "help":
-			fmt.Println("Affichage de l'aide...")
+			base.Help()
 		case "kill":
 			fmt.Println("Arrêt du programme...")
 			// Ajoutez ici le code pour arrêter proprement votre programme si nécessaire
+			os.Exit(0)
+		case "clear":
+			base.ClearScreen()
 		default:
-			fmt.Println("Commande 'oft : ", command, "' -> non reconnue.")
+			fmt.Printf("Commande 'oft %s' non reconnue.\n", subCommand)
 		}
 	} else {
 		fmt.Println("Veuillez écrire d'abord \"oft\"")
@@ -59,4 +91,32 @@ func GetOutboundIP() net.IP {
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
 
 	return localAddr.IP
+}
+
+func splitCommand(command string) []string {
+	var parts []string
+	var current strings.Builder
+	inQuotes := false
+
+	for _, char := range command {
+		switch {
+		case char == '"' && !inQuotes:
+			inQuotes = true
+		case char == '"' && inQuotes:
+			inQuotes = false
+		case unicode.IsSpace(char) && !inQuotes:
+			if current.Len() > 0 {
+				parts = append(parts, current.String())
+				current.Reset()
+			}
+		default:
+			current.WriteRune(char)
+		}
+	}
+
+	if current.Len() > 0 {
+		parts = append(parts, current.String())
+	}
+
+	return parts
 }
