@@ -6,6 +6,7 @@ import (
     "net/http"
     "path/filepath"
     "io/ioutil"
+    "context"
 )
 
 var (
@@ -13,15 +14,7 @@ var (
     mux    = http.NewServeMux() // ServeMux global
 )
 
-func init() {
-    // Register routes during initialization
-    mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        // Default handler for root path
-        http.Error(w, "Not found", http.StatusNotFound)
-    }))
-}
-
-func Host(hostMode *bool, commands []string, cliPrefix *string, folderPath *string) {
+func Host(hostMode *bool, commands []string, cliPrefix *string, folderPath *string, port *string) {
     if len(commands) < 3 {
         fmt.Println("Invalid arguments")
         return
@@ -33,7 +26,13 @@ func Host(hostMode *bool, commands []string, cliPrefix *string, folderPath *stri
         *hostMode = true
         *folderPath = commands[4]
 
-        startServer(commands[4])
+        if len(commands) > 6 && commands[5] == "-p" && commands[6] != "" {
+            *port = commands[6]
+        } else {
+            *port = "7000"
+        }
+
+        startServer(commands[4], *port)
 
     } else if commands[2] == "stop" && *hostMode {
         fmt.Println("Stopping hosting...")
@@ -53,7 +52,7 @@ func Host(hostMode *bool, commands []string, cliPrefix *string, folderPath *stri
     }
 }
 
-func startServer(folderPath string) {
+func startServer(folderPath, port string) {
     // Resolve absolute path
     absPath, err := filepath.Abs(folderPath)
     if err != nil {
@@ -64,27 +63,32 @@ func startServer(folderPath string) {
     fileServer := http.FileServer(http.Dir(absPath))
 
     // Register handler with global ServeMux
-    mux.Handle("/files/", http.StripPrefix("/files/", fileServer))
+    mux.Handle("/", fileServer)
 
     // Start HTTP server
-    server = &http.Server{Addr: ":8080", Handler: mux} // Use global mux
+    server = &http.Server{Addr: ":" + port, Handler: mux} // Use global mux
     go func() {
         if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
             log.Fatal("Error starting HTTP server:", err)
         }
     }()
-    fmt.Printf("Server started. Hosting %s on port 8080.\n", absPath)
+    fmt.Printf("Server started. Hosting %s on port %s.\n", absPath, port)
 }
+
 
 func stopServer() {
     if server != nil {
-        if err := server.Shutdown(nil); err != nil {
+        // Arrêter le serveur HTTP
+        if err := server.Shutdown(context.Background()); err != nil {
             log.Fatal("Error stopping HTTP server:", err)
         }
         fmt.Println("Server stopped.")
         
-        // Reset ServeMux
+        // Réinitialiser le ServeMux
         resetServeMux()
+
+        // Définir server à nil pour indiquer qu'il n'est plus en cours d'exécution
+        server = nil
 
     } else {
         fmt.Println("Server is not running.")
@@ -92,10 +96,10 @@ func stopServer() {
 }
 
 func resetServeMux() {
-    // Create a new ServeMux to replace the global one
+    // Créer un nouveau ServeMux pour remplacer le global
     mux = http.NewServeMux()
     mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        // Default handler for root path
+        // Gestionnaire par défaut pour le chemin racine
         http.Error(w, "Not found", http.StatusNotFound)
     }))
     fmt.Println("ServeMux reset.")
@@ -103,7 +107,7 @@ func resetServeMux() {
 
 func scanFolder(ipPort string) {
     // Send HTTP request to server at ipPort to get directory listing
-    resp, err := http.Get("http://" + ipPort + "/files/")
+    resp, err := http.Get("http://" + ipPort + "/")
     if err != nil {
         log.Fatal("Error scanning folder:", err)
     }

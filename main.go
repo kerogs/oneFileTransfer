@@ -17,6 +17,7 @@ var (
 	// Variables globales pour l'application
 	hostMode = false
 	folderPath = ""
+	port string
 
 	// Variables pour l'interface CLI
 	cliPrefix = "user"
@@ -79,9 +80,9 @@ func Command(commands []string) {
 		case "clear":
 			cli.ClearScreen()
 		case "status":
-			cli.Status(cliPrefix, cliType, cliSuffix, cliEnd)
+			cli.Status(cliPrefix, cliType, cliSuffix, cliEnd, folderPath, port)
 		case "host":
-			cli.Host(&hostMode, commands, &cliPrefix, &folderPath)
+			cli.Host(&hostMode, commands, &cliPrefix, &folderPath, &port)
 		case "login":
 			// cli.Login(commands[2])
 		default:
