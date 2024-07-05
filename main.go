@@ -18,6 +18,9 @@ var (
 	hostMode = false
 	folderPath = ""
 	port string
+	
+	// Version
+	version = "1.0.0"
 
 	// Variables pour l'interface CLI
 	cliPrefix = "user"
@@ -30,7 +33,7 @@ var (
 func main() {
 	cliSuffix = GetOutboundIP().String()
 	reader := bufio.NewReader(os.Stdin)
-	cli.AsciiStart()
+	cli.AsciiStart(version)
 
 	for {
 		if cliPrefix == "user" {
@@ -72,7 +75,7 @@ func Command(commands []string) {
 		subCommand := commands[1]
 		switch subCommand {
 		case "help":
-			cli.Help()
+			cli.Help(version)
 		case "kill":
 			fmt.Println("Arrêt du programme...")
 			// Ajoutez ici le code pour arrêter proprement votre programme si nécessaire

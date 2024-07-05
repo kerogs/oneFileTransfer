@@ -8,7 +8,8 @@ import (
 	// "oft/config/colors"
 )
 
-func Help() {
+func Help(version string) {
+    fmt.Println("Version : " + version)
 	fmt.Println("Usage: oft <command> [options]")
 	fmt.Println("Commands:")
 	fmt.Println("  host -d <directory>  : Start hosting files from specified directory")
@@ -24,7 +25,7 @@ func ClearScreen() {
     cmd.Run()
 }
 
-func AsciiStart(){
+func AsciiStart(version string){
 	fmt.Println(color.Red)
     fmt.Println("                       $o")
     fmt.Println("                       $                     .........")
@@ -40,7 +41,7 @@ func AsciiStart(){
     fmt.Println(" !!$$$!!!$$!$$!!!!!!!!!!oo.....     ' ''  o$$o .      ''oo..")
     fmt.Println(" !!!$$!!!!!!!!!!!!!!!!!!!!!!!!!!!!ooooo..      'o  oo..    $")
     fmt.Println("  '!!$$!!!!!!oneFileTransfer!!!!!!!!!!!!!!!oooooo..  ''   ,$")
-    fmt.Println("   '!!$!!!!!!!!!!!!by kerogs!!!!!!!!!!!!!!!!!!!!!!!!oooo..$$")
+    fmt.Println("   '!!$!!!!!!!!v"+version+" kerogs!!!!!!!!!!!!!!!!!!!!!!!!oooo..$$")
     fmt.Println("    !!$!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!$'")
     fmt.Println("    '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$!!!!!!!!!!!!!!!!!!,")
     fmt.Println(".....$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$.....")
