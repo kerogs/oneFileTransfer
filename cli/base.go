@@ -10,10 +10,11 @@ import (
 
 func Help(version string) {
     fmt.Println("Version : " + version)
-	fmt.Println("Usage: oft <command> [options]")
+	fmt.Println("Usage: oft <command> [options] \n")
 	fmt.Println("Commands:")
-	fmt.Println("  host -d <directory>  : Start hosting files from specified directory")
-    fmt.Println("       -p <port>       : Optional (default : 7000)")
+	fmt.Println("  host start -d <directory>  : Start hosting files from specified directory")
+    fmt.Println("       start -p <port>       : Optional (default : 7000)")
+    fmt.Println("       stop                  : Stop hosting")
 	fmt.Println("  scan                 : Scan for hosts that are hosting files")
 	fmt.Println("  kill                 : Terminate the program (ctrl + c -> work too)")
 	fmt.Println("  clear                : Clear the console screen")
@@ -55,8 +56,8 @@ func Status(cliPrefix, cliType, cliSuffix, cliEnd, folderPath, port string,) {
         fmt.Println(color.Green + cliPrefix + color.Reset)
     } else if cliPrefix == "host" {
         fmt.Println(color.Red + cliPrefix + color.Reset)
-        fmt.Println("-PATH       "+ folderPath)
-        fmt.Println("-PORT       "+ port)
+        fmt.Println("-d       "+ folderPath)
+        fmt.Println("-p       "+ port)
         
     } else if cliPrefix == "lurker"{
         fmt.Println(color.Magenta + cliPrefix + color.Reset)
