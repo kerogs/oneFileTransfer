@@ -10,7 +10,7 @@ import (
 
 func Help(version string) {
     fmt.Println("Version : " + version)
-	fmt.Println("Usage: oft <command> [options] \n")
+	fmt.Println("Usage: oft <command> [options] \n ")
 	fmt.Println("Commands:")
 	fmt.Println("  host start -d <directory>  : Start hosting files from specified directory")
     fmt.Println("       start -p <port>       : Optional (default : 7000)")
